@@ -1,6 +1,7 @@
 package iavl
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -308,6 +309,34 @@ func (t *ImmutableTree) isLatestTreeVersion() (bool, error) {
 	}
 	return t.version == latestVersion, nil
 }
+
+// ValidateTree traverses the tree and compares a node hash with real node hash
+func (t *ImmutableTree) ValidateTree() bool {
+	valid := true
+	// ForceHash can panic for corrupted nodes
+	defer func() {
+		if r := recover(); r != nil {
+			valid = false
+		}
+	}()
+
+	if t.root == nil {
+		return true
+	}
+	if bytes.Compare(t.root.ForceHash(), t.root.hash) != 0 {
+		return false
+	}
+
+	t.root.traverseInRange(t, nil, nil, false, true, 0, false, func(node *Node, u uint8) bool {
+		if bytes.Compare(node.ForceHash(), node.hash) != 0 {
+			valid = false
+			return true
+		}
+		return false
+	})
+	return valid
+}
+
 
 // Clone creates a clone of the tree.
 // Used internally by MutableTree.

@@ -245,7 +245,11 @@ func (node *Node) _hash() ([]byte, error) {
 	if node.hash != nil {
 		return node.hash, nil
 	}
+	node.hash = node.ForceHash()
+	return node.hash
+}
 
+func (node *Node) ForceHash() []byte {
 	h := sha256.New()
 	buf := new(bytes.Buffer)
 	if err := node.writeHashBytes(buf); err != nil {
