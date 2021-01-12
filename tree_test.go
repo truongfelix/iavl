@@ -2080,7 +2080,6 @@ func TestMutableTree_SaveVersionAt(t *testing.T) {
 	_, v2 := tree.Get([]byte{0x2})
 	require.Equal([]byte{0x3}, v2)
 
-	require.Panics(func() {
-		tree.SaveVersionAt(version - 1)
-	})
+	_, _, err = tree.SaveVersionAt(version - 1)
+	require.Error(err)
 }
