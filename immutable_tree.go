@@ -327,7 +327,7 @@ func (t *ImmutableTree) ValidateTree() bool {
 		return false
 	}
 
-	t.root.traverseInRange(t, nil, nil, false, true, 0, false, func(node *Node, u uint8) bool {
+	t.root.traverseInRange(t, nil, nil, false, true, false, func(node *Node) bool {
 		if bytes.Compare(node.ForceHash(), node.hash) != 0 {
 			valid = false
 			return true
