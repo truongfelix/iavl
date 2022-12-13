@@ -567,7 +567,7 @@ func TestTreeProof(t *testing.T) {
 
 func TestImmutableTree_ValidateTree(t *testing.T) {
 	db := db.NewMemDB()
-	tree, _ := NewMutableTree(db, 100)
+	tree, _ := NewMutableTree(db, 100, true)
 
 	for i := byte(0); i < 255; i++ {
 		tree.Set([]byte{i}, []byte{i})
@@ -575,14 +575,14 @@ func TestImmutableTree_ValidateTree(t *testing.T) {
 
 	tree.SaveVersion()
 
-	tree, _ = NewMutableTree(db, 100)
+	tree, _ = NewMutableTree(db, 100, true)
 	tree.Load()
 	assert.True(t, tree.ValidateTree())
 
 	hash := tree.root.hash
 	var node *Node
 	for {
-		node = tree.ndb.GetNode(hash)
+		node, _ = tree.ndb.GetNode(hash)
 		if node.rightHash == nil {
 			break
 		}
@@ -591,14 +591,14 @@ func TestImmutableTree_ValidateTree(t *testing.T) {
 
 	node.value = []byte("corrupted")
 	node.persisted = false
-
-	assert.NotEqual(t, node.hash, node.ForceHash())
+	hash, _ =  node.ForceHash()
+	assert.NotEqual(t, node.hash, hash )
 	tree.ndb.SaveNode(node)
 
 	tree.SaveVersion()
 	assert.False(t, tree.ValidateTree())
 
-	tree, _ = NewMutableTree(db, 100)
+	tree, _ = NewMutableTree(db, 100, true)
 	tree.Load()
 
 	assert.False(t, tree.ValidateTree())

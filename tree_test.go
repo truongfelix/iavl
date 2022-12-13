@@ -2057,7 +2057,7 @@ func TestNodeCacheStatisic(t *testing.T) {
 func TestMutableTree_SaveVersionAt(t *testing.T) {
 	require := require.New(t)
 
-	tree, _ := NewMutableTree(db.NewMemDB(), 0)
+	tree, _ := NewMutableTree(db.NewMemDB(), 0, true)
 
 	tree.Set([]byte{0x1}, []byte{0x2})
 	tree.SaveVersion()

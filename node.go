@@ -245,11 +245,12 @@ func (node *Node) _hash() ([]byte, error) {
 	if node.hash != nil {
 		return node.hash, nil
 	}
-	node.hash = node.ForceHash()
-	return node.hash
+	var err error
+	node.hash, err = node.ForceHash()
+	return node.hash, err
 }
 
-func (node *Node) ForceHash() []byte {
+func (node *Node) ForceHash() ([]byte, error) {
 	h := sha256.New()
 	buf := new(bytes.Buffer)
 	if err := node.writeHashBytes(buf); err != nil {
@@ -259,9 +260,7 @@ func (node *Node) ForceHash() []byte {
 	if err != nil {
 		return nil, err
 	}
-	node.hash = h.Sum(nil)
-
-	return node.hash, nil
+	return h.Sum(nil), nil
 }
 
 // Hash the node and its descendants recursively. This usually mutates all

@@ -323,12 +323,21 @@ func (t *ImmutableTree) ValidateTree() bool {
 	if t.root == nil {
 		return true
 	}
-	if bytes.Compare(t.root.ForceHash(), t.root.hash) != 0 {
+	hash, err := t.root.ForceHash()
+	if err!=nil {
+		return false
+	}
+	if bytes.Compare(hash, t.root.hash) != 0 {
 		return false
 	}
 
 	t.root.traverseInRange(t, nil, nil, false, true, false, func(node *Node) bool {
-		if bytes.Compare(node.ForceHash(), node.hash) != 0 {
+		hash, err := node.ForceHash()
+		if err!=nil{
+			valid = false
+			return true
+		}
+		if bytes.Compare(hash, node.hash) != 0 {
 			valid = false
 			return true
 		}
